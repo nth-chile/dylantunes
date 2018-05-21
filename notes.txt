@@ -1,0 +1,24 @@
+version 2
+
+ability to get other sources?
+title 'deadtracks.live' should change to navigated date
+touchdrag functionality
+the bug where you click, hold, drag outside of window, release, and drag is still happening
+on phone, the small region on right where anchor tags to not meet right edge of list item ... often gets tapped by right-handed users.
+onend, update url
+if last track, either stop or move to next show.
+Why is it incomplete? The last show is June 30, 1995 for example.. and any info on sources?
+
+Work in progress! Very exciting. If you could make a simple favourites button that would be awesome. So one could jump in and see their fave shows in one list.
+
+Also check this for the mobile experience: https://forum.bubble.is/t/hide-the-address-bar-in-the-browser-when-on-mobile-or-specific-pages-on-desktop-fullscreen-experience/17496
+
+SEE reddit thredad
+
+LIVE SEARCH FUNCTION
+
+either have 'aint' match with 'ain't', or let ''' get thru
+
+
+
+on year page, search then hit back. url is 8081/&
