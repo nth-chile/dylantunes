@@ -24,7 +24,7 @@ fs.readFile(inputFile, function (err, data) {
 })
 
 function buildGdFromGdCollection(start, end) {
-	var resultsWithMp3 = [];
+	var results = [];
 
 	(function buildResultsWithMp3(start, end) {
 		//GET metadata of gdCollection array items from start index to end (inclusive)
@@ -51,46 +51,26 @@ function buildGdFromGdCollection(start, end) {
 
 				res.on("end", () => {
 					body = JSON.parse(body);
-
-					if (body.files != undefined && body.files.some(endsWithMp3)) {
-						resultsWithMp3.push(body);
-					} else {
-            console.log('no mp3s! not exiting. index: ', i);
-          }
-
+					results.push(body);
 					if ( ++getRequests == end - start ) {
-
-            console.log('about to handle. index: ', i);
-						handleResultsWithMp3();
-						//setTimeout(getMetadata(end + 1, end + 31), 0);
+						handleResults();
 					}
-
 				})
-
 			}) //HTTPS.GET
-
 		}
-
   })(start, end);
 
- 	function handleResultsWithMp3() {
-    var counter = resultsWithMp3.length;
-	 	resultsWithMp3.forEach(addSourceToSOURCES);
+ 	function handleResults() {
+    var counter = results.length;
+	 	results.forEach(addSourceToSOURCES);
 
 	 	function addSourceToSOURCES(element, index, array) {
 	 		try {
+        // date stuff
+        let date, day, month, year;
+
 	 			if (element.metadata && element.metadata.date) {
 	 				let dateStr = element.metadata.date;
-	 				let date,
-	 					day,
-	 					dir,
-	 					month,
-	 					server,
-	 					subject,
-	 					title,
-	 					venue,
-	 					year;
-
 	 				const dateStrMatches = dateStr.match(/(\d{2,4})-(\d{1,2})-(\d{1,2})/);
 
 	 				if(dateStrMatches) {
@@ -122,45 +102,42 @@ function buildGdFromGdCollection(start, end) {
 	 					date = new Date(`<${year}-${month}-${day}>`);
 	 				}
 
-	 				else throw 'weird dateStri:' + dateStr;
+	 				else date = dateStr;
+        }
 
+ 				//get mp3s from source
+ 				let tracks = element.files ? element.files.filter(file => file.name.slice(-4) === '.mp3' ) : []
 
-	 				//get mp3s from source
-	 				let tracks = element.files.filter(file => file.name.slice(-4) === '.mp3' );
+ 				//build array of track objects
+ 				let tracksObjs = tracks.map(function(track, index, array) {
+ 					return {
+ 						duration: track.length || undefined,
+ 						title: track.title || undefined,
+ 						track: track.track || undefined,
+ 						uri: track.name || undefined,
+ 					};
+ 				});
 
-	 				//build array of track objects
-	 				let tracksObjs = tracks.map(function(track, index, array) {
-	 					return {
-	 						duration: track.length,
-	 						title: track.title,
-	 						track: track.track,
-	 						uri: track.name,
-	 					};
-	 				});
+ 				//build source obj
+ 				let sourceObj = {
+ 					date: date || undefined,
+ 					dir: element.dir || undefined,
+ 					tracks: tracksObjs,
+ 					server: element.server || undefined,
+ 					subject: element.metadata && element.metadata.subject || undefined,
+ 					title: element.metadata && element.metadata.title || undefined,
+ 					venue: element.metadata && element.metadata.venue || undefined,
+ 				};
 
-	 				//build source obj
-	 				let sourceObj = {
-	 					date: date,
-	 					dir: element.dir || undefined,
-	 					tracks: tracksObjs,
-	 					server: element.server || undefined,
-	 					subject: element.metadata.subject || undefined,
-	 					title: element.metadata.title || undefined,
-	 					venue: element.metadata.venue || undefined,
-	 				};
+ 				//push source
+ 				SOURCES.push(sourceObj);
 
-	 				//push source
-	 				SOURCES.push(sourceObj);
-
-	 				if (--counter == 0) {
-	 					console.log('bout 2 do');
-	 					//insertGdIntoDB();
-	 				}
-	 			}
-
-	 			else throw 'no date ... or no metadata';
-
+ 				if (--counter == 0) {
+ 					console.log('bout 2 do');
+ 					//insertGdIntoDB();
+ 				}
 	 		}
+
 	 		catch (e) {
 	 			console.log(e);
 	 		}
