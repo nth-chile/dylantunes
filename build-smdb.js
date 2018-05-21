@@ -3,6 +3,7 @@ const ENTRY = 'BobDylan'
 const https = require("https")
 const fs = require("fs")
 const inputFile = "./identifiers/identifiers_BobDylan.js"
+require('dotenv').config()
 
 let getRequests = 0
 let identifiers
@@ -149,7 +150,6 @@ function buildGdFromGdCollection(start, end) {
 
 
 // function insertGdIntoDB() {
-// 	console.log('dbing');
 // 	var MongoClient = require('mongodb').MongoClient;
 //
 // 	var db_uri = "";
